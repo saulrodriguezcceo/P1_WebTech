@@ -45,10 +45,11 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('sky', 'assets/sky.png');
-    this.load.image('ground', 'assets/platform.png');
+    this.load.image('sky', 'assets/gotham.jpg');
+    this.load.image('ground', 'assets/platform2.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
+    this.load.image('pause','assets/pause.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
 
@@ -59,18 +60,19 @@ function create ()
 
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = this.physics.add.staticGroup();
-
-    //just added the function tu pause
-
-    /*code de pausa*/
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    platforms.create(400, 600, 'ground').setScale(2).refreshBody();
 
     //  Now let's create some ledges
-    platforms.create(600, 400, 'ground');
-    platforms.create(50, 250, 'ground');
-    platforms.create(750, 220, 'ground');
+    platforms.create(400, 500, 'ground');//platform 1
+    platforms.create(5, 400, 'ground');//platform 2
+    platforms.create(400,300,'ground');//platform 3
+    platforms.create(750,400,'ground');//platform 4
+    platforms.create(750, 220, 'ground');//platform 5
+    platforms.create(5, 220, 'ground');//platform
+    platforms.create(900,100, 'ground');//Joker´s platform
+
 
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'dude');
@@ -78,6 +80,9 @@ function create ()
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
+
+
+    //imagen para la pausa
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -120,7 +125,7 @@ function create ()
     bombs = this.physics.add.group();
 
     //  The score
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '40px', fill: '#ffffff' });
 
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
@@ -194,6 +199,7 @@ function collectStar (player, star)
 }
 
 function pause(player,bomb){
+    this.physics.pause();
 
 }
 function hitBomb (player, bomb)
