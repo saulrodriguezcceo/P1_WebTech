@@ -42,6 +42,7 @@ var gameOver = false;
 var scoreText;
 
 var game = new Phaser.Game(config);
+//var game = new Phaser.Game(800, 600, Phaser.AUTO, 'arcade', { preload: preload, create: create,update: update });
 
 function preload ()
 {
@@ -49,6 +50,7 @@ function preload ()
     this.load.image('ground', 'assets/platform2.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
+    this.load.image('joker', 'assets/oie_transparent (1).png');
     this.load.image('pause','assets/pause.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
@@ -81,8 +83,11 @@ function create ()
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
 
+    //  joker physics properties. Give the little guy a slight bounce.
+    malo = this.physics.add.sprite(800, 100, 'joker');
+    malo.setBounce(0.2);
+    malo.setCollideWorldBounds(true);
 
-    //imagen para la pausa
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -105,14 +110,36 @@ function create ()
         repeat: -1
     });
 
+    //  Our jokers animations, turning, walking left and walking right.
+
+    this.anims.create({
+        key: 'left',
+        frames: this.anims.generateFrameNumbers('joker', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'turn',
+        frames: [ { key: 'joker', frame: 4 } ],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('joker', { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
     //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
     stars = this.physics.add.group({
         key: 'star',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
+        repeat: 15,
+        setXY: { x: 12, y: 0, stepX: 50 }
     });
 
     stars.children.iterate(function (child) {
@@ -129,6 +156,7 @@ function create ()
 
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
+    this.physics.add.collider(malo, platforms);
     this.physics.add.collider(stars, platforms);
     this.physics.add.collider(bombs, platforms);
 
