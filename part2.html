@@ -26,7 +26,7 @@
     };
 
     var game = new Phaser.Game(config);
-
+    var fondo;
     function preload ()
     {
         this.load.image('sky', 'assets/sky.png');
@@ -34,10 +34,14 @@
         this.load.image('star', 'assets/star.png');
         this.load.image('bomb', 'assets/bomb.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+        this.load.audio('fondo', 'assents/cancion.mp3');
     }
+
 
     function create ()
     {
+        fondo = this.add.audio('fondo');
+        fondo.sound.play();
     }
 
     function update ()
