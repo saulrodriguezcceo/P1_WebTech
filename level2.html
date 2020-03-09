@@ -33,6 +33,7 @@ var config = {
 };
 
 var player;
+var malo;
 var stars;
 var bombs;
 var platforms;
@@ -50,7 +51,7 @@ function preload ()
     this.load.image('ground', 'assets/platform2.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
-    this.load.image('joker', 'assets/oie_transparent (1).png');
+    this.load.image('joker', 'assets/joker.png');
     this.load.image('pause','assets/pause.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
@@ -67,13 +68,13 @@ function create ()
     platforms.create(400, 600, 'ground').setScale(2).refreshBody();
 
     //  Now let's create some ledges
-    platforms.create(400, 500, 'ground');//platform 1
-    platforms.create(5, 400, 'ground');//platform 2
-    platforms.create(400,300,'ground');//platform 3
-    platforms.create(750,400,'ground');//platform 4
-    platforms.create(750, 220, 'ground');//platform 5
-    platforms.create(5, 220, 'ground');//platform
-    platforms.create(900,100, 'ground');//Joker´s platform
+    platforms.create(400, 500, 'ground');   //platform 1
+    platforms.create(5, 400, 'ground');     //platform 2
+    platforms.create(400,300,'ground');     //platform 3
+    platforms.create(750,400,'ground');     //platform 4
+    platforms.create(900, 220, 'ground');   //platform 5
+    platforms.create(5, 220, 'ground');     //platform 6
+    platforms.create(400,100, 'ground');    //platform 7
 
 
     // The player and its settings
@@ -83,8 +84,9 @@ function create ()
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
 
+    // The joker and its settings
+    malo = this.physics.add.sprite(1000, 100, 'joker');
     //  joker physics properties. Give the little guy a slight bounce.
-    malo = this.physics.add.sprite(800, 100, 'joker');
     malo.setBounce(0.2);
     malo.setCollideWorldBounds(true);
 
@@ -112,25 +114,7 @@ function create ()
 
     //  Our jokers animations, turning, walking left and walking right.
 
-    this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('joker', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
 
-    this.anims.create({
-        key: 'turn',
-        frames: [ { key: 'joker', frame: 4 } ],
-        frameRate: 20
-    });
-
-    this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('joker', { start: 5, end: 8 }),
-        frameRate: 10,
-        repeat: -1
-    });
 
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
@@ -149,6 +133,8 @@ function create ()
 
     });
 
+
+
     bombs = this.physics.add.group();
 
     //  The score
@@ -159,9 +145,18 @@ function create ()
     this.physics.add.collider(malo, platforms);
     this.physics.add.collider(stars, platforms);
     this.physics.add.collider(bombs, platforms);
+    //poner bombas desde el principio
+    var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+    var bomb = bombs.create(x, 16, 'bomb');
+    bomb.setBounce(1);
+    bomb.setCollideWorldBounds(true);
+    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    bomb.allowGravity = false;
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, stars, collectStar, null, this);
+    this.physics.add.overlap(player, malo, busted, null, this);
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
 }
@@ -225,6 +220,22 @@ function collectStar (player, star)
 
     }
 }
+ function busted(player,malo){
+    malo.disableBody(true, true);
+    score += 50;
+    scoreText.setText('Score: ' + score);
+    malo = this.physics.add.sprite(100, 100, 'joker');
+    //  joker physics properties. Give the little guy a slight bounce.
+    //malo.setBounce(0.2);
+    malo.setCollideWorldBounds(true);
+    this.physics.add.collider(malo, platforms);
+    /*var bomb0 = bombs.create(x, 16, 'bomb');
+    bomb0.setBounce(1);
+    bomb0.setCollideWorldBounds(true);
+    bomb0.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    bomb0.allowGravity = false;*/
+ }
+
 
 function pause(player,bomb){
     this.physics.pause();
