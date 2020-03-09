@@ -67,6 +67,7 @@ var cursors;
 var score = 0;
 var gameOver = false;
 var scoreText;
+
 var vida = 3;
 var vidaText;
 var nombre = "luis";
@@ -76,27 +77,33 @@ var nivelText;
 var fondo; 
 var estrella; 
 var boom;
+
 var game = new Phaser.Game(config);
 
 function preload ()
 {
     this.load.image('sky', 'assets/sky.png');
-    this.load.image('record', 'assets/record.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+
     this.load.audio('fondo','assets/cancion.mp3');
     this.load.audio('boom','assets/boom.mp3');
     this.load.audio('boom','assets/estrella.mp3');
-    
-}
+  }
 
 function create ()
 {
+
     fondo = this.sound.add('fondo');
     fondo.play();
     this.add.image(400, 300, 'sky');
+    //  A simple background for our game
+    this.add.image(400, 300, 'sky');
+
+    //  The platforms group contains the ground and the 2 ledges we can jump on
+    platforms = this.physics.add.staticGroup();
 
     
     boom = this.sound.add('boom');
@@ -164,9 +171,12 @@ function create ()
 
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+
     vidaText = this.add.text(600,16, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
     nombreText = this.add.text(16, 56, 'nombre '+ nombre, { fontSize: '32px', fill: '#000' });
     nivelText = this.add.text(600, 56, 'nivel: 1',{ fontSize: '32px', fill: '#000' });
+
+
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(stars, platforms);
@@ -176,16 +186,12 @@ function create ()
     this.physics.add.overlap(player, stars, collectStar, null, this);
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
-    //this.sound.play('fondo', );
-    
 }
 function update ()
 {
     if (gameOver)
     {
         return;
-
-        //record();
     }
 
     if (cursors.left.isDown)
@@ -221,6 +227,7 @@ function collectStar (player, star)
     score += 10;
     scoreText.setText('Score: ' + score); 
         //estrella.play();
+    scoreText.setText('Score: ' + score);
     if (stars.countActive(true) === 0)
     {
         
@@ -238,7 +245,7 @@ function collectStar (player, star)
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         bomb.allowGravity = false;
-       
+
     }
 }
 
@@ -261,6 +268,8 @@ function hitBomb (player, bomb)
     //this.boom = this.sound.add('boom');
     fondo.stop();
     boom.play();
+
+    gameOver = true;
 }
 
 </script>
