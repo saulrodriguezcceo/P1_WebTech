@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/sound/webaudio/WebAudioSoundManager.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -57,15 +58,18 @@ function preload ()
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.audio('fondo','assets/cancion.opus');
+    this.load.audio('fondo','assets/cancion.mp3');
     this.load.audio('boom','assets/boom.mp3');
 }
 
 function create ()
 {
-    
+    fondo = this.sound.add('fondo');
+    fondo.play();
     //  A simple background for our game
     this.add.image(400, 300, 'sky');
+    boom = this.sound.add('boom');
+    estrella = this.sound.add('estrella');
     //this.add.audio('fondo');
     /*this.beamsound = this.sound.add("fondo");
     this.beamsound.play();*/
@@ -134,9 +138,9 @@ function create ()
 
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-    vidaText = this.add.text(16,52, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
-    nombreText = this.add.text(16, 96, 'nombre'+nombre, { fontSize: '32px', fill: '#000' });
-    nivelText = this.add.text(16,122, 'nivel: 1',{ fontSize: '32px', fill: '#000' });
+    vidaText = this.add.text(600,16, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
+    nombreText = this.add.text(16, 56, 'nombre '+ nombre, { fontSize: '32px', fill: '#000' });
+    nivelText = this.add.text(600, 56, 'nivel: 1',{ fontSize: '32px', fill: '#000' });
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(stars, platforms);
@@ -238,35 +242,22 @@ function pause(player,bomb){
 function hitBomb (player, bomb)
 {
     
-    //nombreText.setText('nombre: ' + nombre);
+    
     bomb.disableBody(true, true);
-    //this.physics.pause();
+    
 
     player.setTint(0xff0000);
     
     //player.anims.play('turn');
     vida -=1;
     vidaText.setText('Vidas: ' + vida);
-    //record();
-    //localStorage.setItem(score,nombre);
-    //this.add.image(400, 300, 'record');
-    //scoreText = this.add.text(96, 16, 'score: '+ score1, { fontSize: '32px', fill: '#000' });
-    ///nombreText = this.add.text(96, 96, 'nombre'+ nombre1, { fontSize: '32px', fill: '#000' });
+    
       gameOver = true;
+    fondo.stop();
+    boom.play();
     
-    
-    /*boom = this.add.sound('boom');
-    boom.play();*/
 }
 
-/*function record(){
-    var score1 = localStorage.getItem(score);
-    var nombre1 = localStorage.getItem(nombre);
-    scoreText = this.add.text(96, 16, 'score: '+ score1, { fontSize: '32px', fill: '#000' });
-    nombreText = this.add.text(96, 96, 'nombre'+ nombre1, { fontSize: '32px', fill: '#000' });
-    document.getElementById("nombre").innerHTML = nombre1;
-    document.getElementById("score").innerHTML = score1;
-}*/
 </script>
 
 </body>
