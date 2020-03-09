@@ -1,9 +1,10 @@
-<!doctype html>
-<html lang="en">
-<head>
+<!doctype html> 
+<html lang="en"> 
+<head> 
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>    
+    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/sound/webaudio/WebAudioSoundManager.js"></script> 
     <style type="text/css">
         body {
             margin: 0;
@@ -29,9 +30,35 @@ var config = {
         preload: preload,
         create: create,
         update: update
+    },
+    audio: {
+        disableWebAudio: true
+
     }
 };
+var config1={
+    
+    mute: false,
+    volume: 1,
+    rate: 1,
+    detune: 0,
+    seek: 0,
+    loop: true,
+    delay: -1
 
+}
+
+var config2={
+    
+    mute: false,
+    volume: 1,
+    rate: 1,
+    detune: 0,
+    seek: 0,
+    loop: false,
+    delay: -1
+
+}
 var player;
 var stars;
 var bombs;
@@ -46,7 +73,9 @@ var nombre = "luis";
 var nombreText;
 var nivel;
 var nivelText;
-var fondo, estrella, boom;
+var fondo; 
+var estrella; 
+var boom;
 var game = new Phaser.Game(config);
 
 function preload ()
@@ -57,24 +86,26 @@ function preload ()
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.audio('fondo','assets/cancion.opus');
+    this.load.audio('fondo','assets/cancion.mp3');
     this.load.audio('boom','assets/boom.mp3');
+    this.load.audio('boom','assets/estrella.mp3');
+    
 }
 
 function create ()
 {
-    
-    //  A simple background for our game
+    fondo = this.sound.add('fondo');
+    fondo.play();
     this.add.image(400, 300, 'sky');
-    //this.add.audio('fondo');
-    /*this.beamsound = this.sound.add("fondo");
-    this.beamsound.play();*/
-    //  The platforms group contains the ground and the 2 ledges we can jump on
+
+    
+    boom = this.sound.add('boom');
+    estrella = this.sound.add('estrella');
     platforms = this.physics.add.staticGroup();
-
-    //just added the function tu pause
-
-    /*code de pausa*/
+    /*this.bounceSound = this.add.audio('fondo');
+    if(this.audioStatus) {
+    this.bounceSound.play();
+    }*/
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
@@ -133,9 +164,9 @@ function create ()
 
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-    vidaText = this.add.text(16,52, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
-    nombreText = this.add.text(16, 96, 'nombre'+nombre, { fontSize: '32px', fill: '#000' });
-    nivelText = this.add.text(16,122, 'nivel: 1',{ fontSize: '32px', fill: '#000' });
+    vidaText = this.add.text(600,16, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
+    nombreText = this.add.text(16, 56, 'nombre '+ nombre, { fontSize: '32px', fill: '#000' });
+    nivelText = this.add.text(600, 56, 'nivel: 1',{ fontSize: '32px', fill: '#000' });
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(stars, platforms);
@@ -145,10 +176,9 @@ function create ()
     this.physics.add.overlap(player, stars, collectStar, null, this);
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
-    //this.sound.play('fondo', {loop: true});
+    //this.sound.play('fondo', );
     
 }
-
 function update ()
 {
     if (gameOver)
@@ -189,10 +219,11 @@ function collectStar (player, star)
 
     //  Add and update the score
     score += 10;
-    scoreText.setText('Score: ' + score);
-    
+    scoreText.setText('Score: ' + score); 
+        //estrella.play();
     if (stars.countActive(true) === 0)
     {
+        
         //  A new batch of stars to collect
         stars.children.iterate(function (child) {
 
@@ -207,18 +238,12 @@ function collectStar (player, star)
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         bomb.allowGravity = false;
-       // estrella.play();
-
+       
     }
 }
 
-function pause(player,bomb){
-
-}
 function hitBomb (player, bomb)
 {
-    //nombreText.setText('nombre: ' + nombre);
-    
     this.physics.pause();
 
     player.setTint(0xff0000);
@@ -226,26 +251,18 @@ function hitBomb (player, bomb)
     player.anims.play('turn');
     vida -=1;
     vidaText.setText('Vidas: ' + vida);
-    //record();
     localStorage.setItem(score,nombre);
-    this.add.image(400, 300, 'record');
-    scoreText = this.add.text(96, 16, 'score: '+ score1, { fontSize: '32px', fill: '#000' });
-    nombreText = this.add.text(96, 96, 'nombre'+ nombre1, { fontSize: '32px', fill: '#000' });
+    
+    scoreText = this.add.text(256, 16, 'score: '+ score, { fontSize: '32px', fill: '#000' });
+    nombreText = this.add.text(288, 96, 'nombre '+ nombre, { fontSize: '32px', fill: '#000' });
         gameOver = true;
     
     
-    /*boom = this.add.sound('boom');
-    boom.play();*/
+    //this.boom = this.sound.add('boom');
+    fondo.stop();
+    boom.play();
 }
 
-/*function record(){
-    var score1 = localStorage.getItem(score);
-    var nombre1 = localStorage.getItem(nombre);
-    scoreText = this.add.text(96, 16, 'score: '+ score1, { fontSize: '32px', fill: '#000' });
-    nombreText = this.add.text(96, 96, 'nombre'+ nombre1, { fontSize: '32px', fill: '#000' });
-    document.getElementById("nombre").innerHTML = nombre1;
-    document.getElementById("score").innerHTML = score1;
-}*/
 </script>
 
 </body>
