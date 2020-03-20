@@ -71,7 +71,7 @@ var c =10;
 var timedEvent;
 var vida = 3;
 var vidaText;
-var nombre = "luis";
+var nombre = window.localStorage.getItem('Name');
 var nombreText;
 var nivel;
 var nivelText;
@@ -89,7 +89,7 @@ function preload ()
     this.load.audio('fondo','assets/cancion.mp3');
     this.load.audio('boom','assets/boom.mp3');
     this.load.audio('bat','assets/bat.mp3');
-    this.load.audio('batE','assets/bativida.mp3');
+    this.load.audio('batE','assets/batvida.mp3');
     this.load.image('starS','assets/star.png');
 }
 
