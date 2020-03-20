@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.js"></script>
+
     <style type="text/css">
         body {
             margin: 0;
@@ -38,6 +39,7 @@
     var bads0;
     var stars;
     var vida=3;
+    var nivel;
     var bombs;
     var platforms;
     var cursors;
@@ -198,6 +200,7 @@
         bombs = this.physics.add.group();
 
         //  The score
+        nivelText = this.add.text(600, 56, 'Nivel: 3',{ fontSize: '32px', fill: '#ffffff' });
         scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '40px', fill: '#ffffff' });
         vidaText = this.add.text(600,16, 'vidas: 3',{ fontSize: '32px', fill: '#ffffff' });
 
