@@ -40,16 +40,16 @@
 
     function create (){
         var menu = this.add.image(400, 300, 'background');
-        var batman = this.add.image(400, 300, 'batman');
-        var robin = this.add.image(400, 300, 'robin');
+        var batman = this.add.image(200, 300, 'batman');
+        var robin = this.add.image(600, 300, 'robin');
         batman.setInteractive();
         robin.setInteractive();
 
         batman.on('pointerup', (() =>{
-            location.assign('menu.html');
+            location.assign('batman1.1.html');
         }));
         robin.on('pointerup', (() =>{
-            location.assign('menu.html');
+            location.assign('graficos.html');
         }));
 
     }

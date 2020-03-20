@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
-
     <script src="//cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.js"></script>
     <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/sound/webaudio/WebAudioSoundManager.js"></script>
-
     <style type="text/css">
         body {
             margin: 0;
@@ -36,16 +34,24 @@ var config = {
 };
 
 var player;
+var band=0;
+var count1=0;
 var stars;
+var starE;
+var starE1;
+var count=0;
 var bombs;
 var platforms;
 var cursors;
 var score = 0;
 var gameOver = false;
 var scoreText;
+var text;
+var c =10;
+var timedEvent;
 var vida = 3;
 var vidaText;
-var nombre = "luis";
+var nombre = window.localStorage.getItem('Name');
 var nombreText;
 var nivel;
 var nivelText;
@@ -60,15 +66,20 @@ function preload ()
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.audio('fondo','assets/cancion.opus');
+    this.load.audio('fondo','assets/cancion.mp3');
     this.load.audio('boom','assets/boom.mp3');
+    this.load.image('starS','assets/star.png');
 }
 
 function create ()
 {
-
+    starE=new Array(2);
+    fondo = this.sound.add('fondo');
+    fondo.play();
     //  A simple background for our game
     this.add.image(400, 300, 'sky');
+    boom = this.sound.add('boom');
+    estrella = this.sound.add('estrella');
     //this.add.audio('fondo');
     /*this.beamsound = this.sound.add("fondo");
     this.beamsound.play();*/
@@ -81,7 +92,6 @@ function create ()
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-
     //  Now let's create some ledges
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
@@ -89,7 +99,7 @@ function create ()
 
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'dude');
-
+    
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
@@ -101,6 +111,7 @@ function create ()
         frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
         frameRate: 10,
         repeat: -1
+        
     });
 
     this.anims.create({
@@ -118,13 +129,14 @@ function create ()
 
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
-
+   
     //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
     stars = this.physics.add.group({
         key: 'star',
         repeat: 11,
         setXY: { x: 12, y: 0, stepX: 70 }
     });
+   
 
     stars.children.iterate(function (child) {
 
@@ -134,16 +146,19 @@ function create ()
     });
 
     bombs = this.physics.add.group();
-
+    starE1 = this.physics.add.group();
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-    vidaText = this.add.text(16,52, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
-    nombreText = this.add.text(16, 96, 'nombre'+nombre, { fontSize: '32px', fill: '#000' });
-    nivelText = this.add.text(16,122, 'nivel: 1',{ fontSize: '32px', fill: '#000' });
+    vidaText = this.add.text(600,16, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
+    nombreText = this.add.text(16, 56, 'nombre '+ nombre, { fontSize: '32px', fill: '#000' });
+    nivelText = this.add.text(600, 56, 'Nivel: 1',{ fontSize: '32px', fill: '#000' });
+    text = this.add.text(300, 32,'',{ fontSize: '32px', fill: '#fff' });
+    
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(stars, platforms);
     this.physics.add.collider(bombs, platforms);
+    this.physics.add.collider(starE1, platforms);
 
     var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
     var bomb = bombs.create(x, 16, 'bomb');
@@ -152,21 +167,24 @@ function create ()
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         bomb.allowGravity = false;
 
-
+    
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, stars, collectStar, null, this);
-
+    this.physics.add.collider(player, starE1, collectStarE, null, this);
     this.physics.add.collider(player, bombs, hitBomb, null, this);
     //this.sound.play('fondo', {loop: true});
-
-
+    
+    
+    
 }
 
 function update ()
 {
+    
+
     if (gameOver)
     {
-
+     
         var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
         var bomb = bombs.create(x, 16, 'bomb');
         bomb.setBounce(1);
@@ -176,7 +194,6 @@ function update ()
         player.preload;
         gameOver=false;
 
-        return;
         if (vida===0){
             location.replace('gameover.html');
         }
@@ -188,25 +205,93 @@ function update ()
         //  A new batch of stars to collect
         band=1;
              stars.children.iterate(function (child) {
-        //record();
+
+                child.enableBody(true, child.x, 0, true, true);
+
+        });
+        //score=0;
+        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+        var bomb = bombs.create(x, 16, 'bomb'); 
+        bomb.setBounce(1);
+        bomb.setCollideWorldBounds(true);
+        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        bomb.allowGravity = false;
+        
+        nivelText.setText('Nivel: 2');
+    
     }
+    if(score>=100 && Phaser.Math.Between(0,100)===100 && count1<2){
+        for (count1=0;count1<2;count1++){
+            starE[count1]= starE1.create(x, 16, 'star');
+            starE[count1].setBounce(1);
+            starE[count1].setCollideWorldBounds(true);
+            starE[count1].setVelocity(Phaser.Math.Between(-200, 200), 20);
+            starE[count1].allowGravity = false;
+            player.preload;
+            starE[count1].setTint(0x33cc00);
+            c=10;
+            if(count1===1)
+                timedEvent = this.time.addEvent({ delay: 800, callback: onEvent, callbackScope:onEvent, loop: true });
+        };
+    }
+
+   
+    if(score>=200){
+        localStorage.setItem(nombre,vida);
+        location.replace('level2.html');
+    }
+   
+
+    if (score>=20 && Phaser.Math.Between(0,100)==100 && count<2){
+        
+        //count++;
+        
+        for (count=0;count<2;count++){
+            starE [count]= starE1.create(x, 16, 'star');
+            starE[count].setBounce(1);
+            starE[count].setCollideWorldBounds(true);
+            starE[count].setVelocity(Phaser.Math.Between(-200, 200), 20);
+            starE[count].allowGravity = false;
+            player.preload;
+            starE[count].setTint(0x33cc00);
+            if(count===1)
+                timedEvent = this.time.addEvent({ delay: 800, callback: onEvent, callbackScope:onEvent, loop: true });
+        };   
+    }
+    function onEvent ()
+        {
+                  c--;
+                 
+                if (c === 0)
+                  {
+                     starE[0].disableBody(true, true);
+                     starE[1].disableBody(true, true);
+                     text.setText('');
+                     timedEvent.remove(false);
+
+                 }else if(c>=0)
+                    text.setText('tiempo:' + c);
+                 
+        }   
+    
+               
 
     if (cursors.left.isDown)
     {
         player.setVelocityX(-160);
-
+        player.clearTint();
         player.anims.play('left', true);
     }
     else if (cursors.right.isDown)
     {
         player.setVelocityX(160);
-
+        player.clearTint();
         player.anims.play('right', true);
     }
     else
     {
         player.setVelocityX(0);
-
+        
         player.anims.play('turn');
     }
 
@@ -216,14 +301,15 @@ function update ()
     }
 }
 
+
 function collectStar (player, star)
 {
     star.disableBody(true, true);
-
+    
     //  Add and update the score
     score += 10;
     scoreText.setText('Score: ' + score);
-
+    
     if (stars.countActive(true) === 0)
     {
         //  A new batch of stars to collect
@@ -234,8 +320,7 @@ function collectStar (player, star)
         });
 
         var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = bombs.create(x, 16, 'bomb');
+        var bomb = bombs.create(x, 16, 'bomb'); 
         bomb.setBounce(1);
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
@@ -245,41 +330,30 @@ function collectStar (player, star)
     }
 }
 
+function collectStarE (player, starE)
+{
+    starE.disableBody(true, true);
+    
+    //  Add and update the score
+    score += 20;
+    scoreText.setText('Score: ' + score);
+}
+
 function pause(player,bomb){
 
 }
 function hitBomb (player, bomb)
 {
-
-    //nombreText.setText('nombre: ' + nombre);
     bomb.disableBody(true, true);
-    //this.physics.pause();
-
     player.setTint(0xff0000);
-
-    //player.anims.play('turn');
     vida -=1;
     vidaText.setText('Vidas: ' + vida);
-    //record();
-    //localStorage.setItem(score,nombre);
-    //this.add.image(400, 300, 'record');
-    //scoreText = this.add.text(96, 16, 'score: '+ score1, { fontSize: '32px', fill: '#000' });
-    ///nombreText = this.add.text(96, 96, 'nombre'+ nombre1, { fontSize: '32px', fill: '#000' });
-      gameOver = true;
-
-
-    /*boom = this.add.sound('boom');
-    boom.play();*/
+    gameOver = true;
+    fondo.stop();
+    boom.play();
+    
 }
 
-/*function record(){
-    var score1 = localStorage.getItem(score);
-    var nombre1 = localStorage.getItem(nombre);
-    scoreText = this.add.text(96, 16, 'score: '+ score1, { fontSize: '32px', fill: '#000' });
-    nombreText = this.add.text(96, 96, 'nombre'+ nombre1, { fontSize: '32px', fill: '#000' });
-    document.getElementById("nombre").innerHTML = nombre1;
-    document.getElementById("score").innerHTML = score1;
-}*/
 </script>
 
 </body>

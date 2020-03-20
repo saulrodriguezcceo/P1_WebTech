@@ -80,6 +80,7 @@
                 textbox.destroy();
                 playerNamePlacehold.destroy();
                 nom_jugador = name;
+                window.localStorage.setItem('Name', nom_jugador);
             location.assign('escogerJugador.html');
         }));
 
