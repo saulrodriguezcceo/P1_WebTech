@@ -5,8 +5,6 @@
     <title>Making your first Phaser 3 Game - Part 10</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/gameobjects/components/Origin.js"></script>
-    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/physics/impact/events/PAUSE_EVENT.js"></script>
-    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/scene/SceneManager.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -18,8 +16,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
-     <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/sound/webaudio/WebAudioSoundManager.js"></script>
-    <script src="https://github.com/photonstorm/phaser/blob/v2.6.2/src/gameobjects/components/Events.js"></script>
+    
     <style type="text/css">
         body {
             margin: 0;
@@ -54,97 +51,62 @@ var config = {
 };
 
 var player;
+var malo;
 var stars;
-var bombs;
+var bombs, f;
 var platforms;
 var cursors;
 var score = 0;
 var gameOver = false;
 var scoreText;
-var vida = 3;
-var vidaText;
-var nombre = "luis";
-var nombreText;
-var nivel;
-var nivelText;
 
-var fondo, bat, boom, h, menu;
 var game = new Phaser.Game(config);
+//var game = new Phaser.Game(800, 600, Phaser.AUTO, 'arcade', { preload: preload, create: create,update: update });
 
 function preload ()
 {
-    this.load.image('sky', 'assets/gothamHD.jpg');
-    this.load.image('record', 'assets/record.png');
-    this.load.image('ground', 'assets/platform.png');
+    this.load.image('sky', 'assets/gotham.jpg');
+    this.load.image('ground', 'assets/platform2.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
+    this.load.image('joker', 'assets/joker.png');
+    this.load.image('pause','assets/pause.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.audio('fondo','assets/cancion.mp3');
-    this.load.audio('boom','assets/boom.mp3');
-    this.load.audio('bat','assets/bat.mp3');
 }
 
-var Pausa = new Phaser.Class({
-            Extends: Phaser.Scene, initialize:
-
-                function Pausa() {
-                    Phaser.Scene.call(this, { key: 'pausa' });
-                },
-
-            preload: function () {
-            },
-
-            create: function () {
-                this.add.image(300, 300, 'sky');
-                var evtpausa = this;
-                this.input.on('pointerdown', function (pointer) {
-                this.add.text(208, 250, 'pausa', { font: '24px Arial', fill: '#fff' });
-                    if (pointer.x > 208 && pointer.x < 390 && pointer.y > 250 && pointer.y < 285) {
-                        evtpausa.scene.stop();
-                        evt.scene.resume();
-                    }
-                });
-
-            }
-        });
 function create ()
 {
-    
-    fondo = this.sound.add('fondo');
-    
-    //this.input.touch.preventDefault = false;
     //  A simple background for our game
     this.add.image(400, 300, 'sky');
-    //fondo.mute= true;
-    fondo.play({loop: true});
-    boom = this.sound.add('boom');
-    bat = this.sound.add('bat');
-    //estrella = this.sound.add('estrella');
-    //this.add.audio('fondo');
-    /*this.beamsound = this.sound.add("fondo");
-    this.beamsound.play();*/
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = this.physics.add.staticGroup();
-
-    //just added the function tu pause
-
-    /*code de pausa*/
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    platforms.create(400, 600, 'ground').setScale(2).refreshBody();
 
     //  Now let's create some ledges
-    platforms.create(600, 400, 'ground');
-    platforms.create(50, 250, 'ground');
-    platforms.create(750, 220, 'ground');
+    platforms.create(400, 500, 'ground');   //platform 1
+    platforms.create(5, 400, 'ground');     //platform 2
+    platforms.create(400,300,'ground');     //platform 3
+    platforms.create(750,400,'ground');     //platform 4
+    platforms.create(900, 220, 'ground');   //platform 5
+    platforms.create(5, 220, 'ground');     //platform 6
+    platforms.create(400,100, 'ground');    //platform 7
+
 
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'dude');
-    
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
+
+    // The joker and its settings
+    malo = this.physics.add.sprite(1000, 100, 'joker');
+    //  joker physics properties. Give the little guy a slight bounce.
+    malo.setBounce(0.2);
+    malo.setCollideWorldBounds(true);
+
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -167,14 +129,18 @@ function create ()
         repeat: -1
     });
 
+    //  Our jokers animations, turning, walking left and walking right.
+
+
+
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
-   
+
     //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
     stars = this.physics.add.group({
         key: 'star',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
+        repeat: 15,
+        setXY: { x: 12, y: 0, stepX: 50 }
     });
 
     stars.children.iterate(function (child) {
@@ -184,83 +150,39 @@ function create ()
 
     });
 
+
+
     bombs = this.physics.add.group();
 
     //  The score
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-    vidaText = this.add.text(600,16, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
-    nombreText = this.add.text(16, 56, 'nombre '+ nombre, { fontSize: '32px', fill: '#000' });
-    nivelText = this.add.text(600, 56, 'nivel: 1',{ fontSize: '32px', fill: '#000' });
-    
-    //this.input.onDown(changeVolume, this);//funcion para mute de musica
+    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '40px', fill: '#ffffff' });
+
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
+    this.physics.add.collider(malo, platforms);
     this.physics.add.collider(stars, platforms);
     this.physics.add.collider(bombs, platforms);
-
+    //poner bombas desde el principio
     var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-    var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
 
+    var bomb = bombs.create(x, 16, 'bomb');
+    bomb.setBounce(1);
+    bomb.setCollideWorldBounds(true);
+    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    bomb.allowGravity = false;
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, stars, collectStar, null, this);
+    this.physics.add.overlap(player, malo, busted, null, this);
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
-    //this.sound.play('fondo', {loop: true});
-    
-    var mute_label, resumeM;
-    // Create a label to use as a button
-    resumeM = this.add.text(700, 200, 'Sonido', { font: '24px Arial', fill: '#fff' });
-    this.input.on('pointerdown', function (pointer) {
-    if (pointer.x > 700 && pointer.x < 750 && pointer.y > 200 && pointer.y < 220) {
-            if (fondo.pause){ 
-                fondo.resume();  
-                boom.resume();
-                bat.resume();
-                h=0;
-            } 
-        }
-    });
-    mute_label = this.add.text(700, 100, 'Mute', { font: '24px Arial', fill: '#fff' });
-    this.input.on('pointerdown', function (pointer) {
-        if (pointer.x > 700 && pointer.x < 750 && pointer.y > 100 && pointer.y < 120) {
-            if (fondo.play){ 
-                fondo.pause();  
-                boom.pause();
-                bat.pause();
-                
-                h=1;
-            } 
-        }
-
-    });
-       
-    
-    
 }
-    
 
 function update ()
 {
     if (gameOver)
     {
-     
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-        player.preload;
-        gameOver=false;
-        
         return;
-        
-        //record();
     }
 
     if (cursors.left.isDown)
@@ -290,21 +212,12 @@ function update ()
 
 function collectStar (player, star)
 {
-    
-    //estrella.play();
-        if(h==1){
-            bat.pause();
-        }else{
-            bat.play();
-        }
-        star.disableBody(true, true);
-    
+    star.disableBody(true, true);
 
-    
     //  Add and update the score
     score += 10;
     scoreText.setText('Score: ' + score);
-    
+
     if (stars.countActive(true) === 0)
     {
         //  A new batch of stars to collect
@@ -316,46 +229,46 @@ function collectStar (player, star)
 
         var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
-        var bomb = bombs.create(x, 16, 'bomb'); 
+        var bomb = bombs.create(x, 16, 'bomb');
         bomb.setBounce(1);
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         bomb.allowGravity = false;
-       // estrella.play();
 
     }
-    //estrella.play();
 }
+ function busted(player,malo){
+    malo.disableBody(true, true);
+    score += 50;
+    scoreText.setText('Score: ' + score);
+    malo = this.physics.add.sprite(100, 100, 'joker');
+    //  joker physics properties. Give the little guy a slight bounce.
+    //malo.setBounce(0.2);
+    malo.setCollideWorldBounds(true);
+    this.physics.add.collider(malo, platforms);
+    /*var bomb0 = bombs.create(x, 16, 'bomb');
+    bomb0.setBounce(1);
+    bomb0.setCollideWorldBounds(true);
+    bomb0.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    bomb0.allowGravity = false;*/
+ }
+
 
 function pause(player,bomb){
+    this.physics.pause();
 
 }
 function hitBomb (player, bomb)
 {
-    
-    
-    bomb.disableBody(true, true);
-    
+    this.physics.pause();
 
     player.setTint(0xff0000);
-    
-    //player.anims.play('turn');
-    vida -=1;
-    vidaText.setText('Vidas: ' + vida);
-    
-      gameOver = true;
-   
-      if(h==1){
-            
-            boom.pause();
-        }else{
-            fondo.pause();
-            boom.play();
-            fondo.resume();
-        }
-    
-    
+
+    player.anims.play('turn');
+
+    gameOver = true;
 }
+
 </script>
 
 </body>
