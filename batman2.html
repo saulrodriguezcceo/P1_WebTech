@@ -3,8 +3,23 @@
 <head>
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.js"></script>
-
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/gameobjects/components/Origin.js"></script>
+    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/physics/impact/events/PAUSE_EVENT.js"></script>
+    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/scene/SceneManager.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+     <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/sound/webaudio/WebAudioSoundManager.js"></script>
+    <script src="https://github.com/photonstorm/phaser/blob/v2.6.2/src/gameobjects/components/Events.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -13,43 +28,54 @@
 </head>
 <body>
 
+<div class="container mx-auto d-block" style="background-color:black;">
+        <div id="bloque" class="text-center mx-auto" style="width: 800px; height: 600px; background-color: black;"></div>
+ </div>
 <script type="text/javascript">
 
-    var config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        physics: {
-            default: 'arcade',
-            arcade: {
-                gravity: { y: 300 },
-                debug: false
-            }
-        },
-        scene: {
-            preload: preload,
-            create: create,
-            update: update
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
         }
-    };
+    
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    },
+    parent:'bloque'
+};
 
-    var player;
-    var batimovils;
-    var spaceKey;
-    var bads0;
-    var stars;
-    var vida=3;
-    var nivel;
-    var bombs;
-    var platforms;
-    var cursors;
-    var score = 200;
-    var gameOver = false;
-    var scoreText;
-    var flag=false;
-    var pause_label;
-    var nombre= window.localStorage.getItem('Name');
-    var fondo,estrella,boom;
+var player;
+var band=0;
+var count1=0;
+var stars;
+var starE;
+var starE1;
+var count=0;
+var bombs;
+var platforms;
+var cursors;
+var score = 0;
+var gameOver = false;
+var scoreText;
+var text;
+var c =10;
+var timedEvent;
+var vida = 3;
+var vidaText;
+var nombre = window.localStorage.getItem('Name');
+var nombreText;
+var nivel;
+var nivelText;
+var fondo, bat, batE, h, boom;
     var w = 800, h = 600;
 
     var game = new Phaser.Game(config);
@@ -92,12 +118,25 @@
         this.load.image('joker', 'assets/joker.png');
         this.load.image('car', 'assets/batimovil.png');
         this.load.image('pause', 'assets/pause.png');
+        this.load.audio('bat','assets/bat.mp3');
+        this.load.audio('batE','assets/bativida.mp3');
+        this.load.audio('fondo','assets/cancion.mp3');
+    this.load.audio('boom','assets/boom.mp3');
         //this.load.image('pause','assets/pause.png');
         this.load.spritesheet('dude', 'assets/dude1.png', { frameWidth: 32, frameHeight: 48 });
     }
 
     function create ()
     {
+        fondo = this.sound.add('fondo');
+    
+    //this.input.touch.preventDefault = false;
+    //  A simple background for our game
+    //fondo.mute= true;
+    fondo.play({loop: true});
+    boom = this.sound.add('boom');
+    bat = this.sound.add('bat');
+    batE = this.sound.add('batE');
         scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '40px', fill: '#ffffff' });
         //  A simple background for our game
         this.add.image(400, 300, 'sky');
@@ -201,9 +240,10 @@
         bombs = this.physics.add.group();
 
         //  The score
-        nivelText = this.add.text(600, 56, 'Nivel: 3',{ fontSize: '32px', fill: '#ffffff' });
-        scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '40px', fill: '#ffffff' });
-        vidaText = this.add.text(600,16, 'vidas: 3',{ fontSize: '32px', fill: '#ffffff' });
+        scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+    vidaText = this.add.text(600,16, 'vidas: 3',{ fontSize: '32px', fill: '#000' });
+    nombreText = this.add.text(16, 56, 'nombre '+ nombre, { fontSize: '32px', fill: '#000' });
+    nivelText = this.add.text(600, 56, 'nivel: 1',{ fontSize: '32px', fill: '#000' });
 
 
         //  Collide the elements with the platforms
@@ -248,7 +288,32 @@
         this.physics.add.overlap(player,batimovils,win,null,this);
 
         this.physics.add.collider(player, bombs, hitBomb, null, this);
+        var mute_label, resumeM;
+    // Create a label to use as a button
+    resumeM = this.add.text(700, 200, 'Sonido', { font: '24px Arial', fill: '#fff' });
+    this.input.on('pointerdown', function (pointer) {
+    if (pointer.x > 700 && pointer.x < 750 && pointer.y > 200 && pointer.y < 220) {
+            if (fondo.pause){ 
+                fondo.resume();  
+                boom.resume();
+                bat.resume();
+                h=0;
+            } 
+        }
+    });
+    mute_label = this.add.text(700, 100, 'Mute', { font: '24px Arial', fill: '#fff' });
+    this.input.on('pointerdown', function (pointer) {
+        if (pointer.x > 700 && pointer.x < 750 && pointer.y > 100 && pointer.y < 120) {
+            if (fondo.play){ 
+                fondo.pause();  
+                boom.pause();
+                bat.pause();
+                
+                h=1;
+            } 
+        }
 
+    });
 
     }
 
@@ -316,6 +381,14 @@
 
     function collectStar (player, star)
     {
+        if(h==1){
+            
+            bat.pause();
+        }else{
+            fondo.pause();
+            bat.play();
+            fondo.resume();
+        }
         star.disableBody(true, true);
 
         //  Add and update the score
@@ -344,6 +417,14 @@
     }
     function busted(player,joker)
     {
+        if(h==1){
+            
+            batE.pause();
+        }else{
+            fondo.pause();
+            batE.play();
+            fondo.resume();
+        }
         joker.disableBody(true, true);
         //  Add and update the score
         score += 1000;
@@ -385,8 +466,14 @@
         vida -=1;
         vidaText.setText('Vidas: ' + vida);
         gameOver = true;
-        //fondo.stop();
-        //boom.play();
+        if(h==1){
+            
+            boom.pause();
+        }else{
+            fondo.pause();
+            boom.play();
+            fondo.resume();
+        }
     }
 
 </script>
