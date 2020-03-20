@@ -35,10 +35,10 @@ var config = {
 
 var player;
 var band=0;
+var count1=0;
 var stars;
 var starE;
 var starE1;
-var count1=0;
 var count=0;
 var bombs;
 var platforms;
@@ -65,7 +65,7 @@ function preload ()
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
-    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('dude', 'assets/dude1.png', { frameWidth: 32, frameHeight: 48 });
     this.load.audio('fondo','assets/cancion.mp3');
     this.load.audio('boom','assets/boom.mp3');
     this.load.image('starS','assets/star.png');
@@ -234,8 +234,11 @@ function update ()
                 timedEvent = this.time.addEvent({ delay: 800, callback: onEvent, callbackScope:onEvent, loop: true });
         };
     }
+
+   
     if(score>=200){
-        location.replace('level2.html');
+        localStorage.setItem(nombre,vida);
+        location.replace('batman2.html');
     }
    
 
@@ -253,12 +256,7 @@ function update ()
             starE[count].setTint(0x33cc00);
             if(count===1)
                 timedEvent = this.time.addEvent({ delay: 800, callback: onEvent, callbackScope:onEvent, loop: true });
-        };
-        
-        
-
-       
-           
+        };   
     }
     function onEvent ()
         {
