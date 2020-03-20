@@ -1,0 +1,55 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>The Batman</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+    var windowObjectReference = null; 
+    var PreviousUrl;
+    
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+        this.load.image('InstBckgr', 'assets/InstruccionesPage.png');
+    }
+
+    function create (){
+        var menu = this.add.image(400, 300, 'InstBckgr');
+        menu.setInteractive();
+        
+        menu.on('pointerup', (() =>{
+            location.assign('menu.html');
+        }));
+
+    }
+
+    function update ()
+    {
+        
+    }
+
+</script>
+
+</body>
+</html>
