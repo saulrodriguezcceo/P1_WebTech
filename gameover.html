@@ -4,9 +4,6 @@
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 10</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/gameobjects/components/Origin.js"></script>
-    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/physics/impact/events/PAUSE_EVENT.js"></script>
-    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/scene/SceneManager.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -18,8 +15,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
-     <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/sound/webaudio/WebAudioSoundManager.js"></script>
-    <script src="https://github.com/photonstorm/phaser/blob/v2.6.2/src/gameobjects/components/Events.js"></script>
+    <script src="https://github.com/photonstorm/phaser/blob/v3.22.0/src/sound/webaudio/WebAudioSoundManager.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -48,7 +44,8 @@
                 preload: preload,
                 create: create,
                 update: update
-            }
+            },
+            parent: 'bloque'
         };
         
         
@@ -80,7 +77,7 @@ var game = new Phaser.Game(config);
 function preload ()
 {
     this.load.image('GAME', 'assets/GAMEOVER.png');
-    
+    this.load.audio('fondo','assets/cancion.mp3');
 }
 function create ()
 {
