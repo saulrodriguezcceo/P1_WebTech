@@ -28,17 +28,44 @@
     };
 
     var game = new Phaser.Game(config);
+    var nombre = "Luis";//
+    var score = "4950";//window.localStorage.getItem('score');
+    var nombre2 = "Cesar";
+    var score2 = "3350";
+    var nombre3 = "Fer";
+    var score3 = "3200";
+    var nombre4 = "Rega";
+    var score4 = "2900";
+    var nombre5 = window.localStorage.getItem('Name');
+    var score5 = window.localStorage.getItem('score');
+    var nombreText;
+    var scoreText;
 
     function preload ()
     {
         this.load.image('background', 'assets/PantallaRecords.png');
-
+        
 
     }
 
     function create (){
         var menu = this.add.image(400, 300, 'background');
         menu.setInteractive();
+        nombreText = this.add.text(100, 200, nombre, { fontSize: '32px', fill: '#fff' });
+        scoreText = this.add.text(500, 200, score, { fontSize: '32px', fill: '#fff'});
+        nombreText = this.add.text(100, 250, nombre2, { fontSize: '32px', fill: '#fff' });
+        scoreText = this.add.text(500, 250, score2, { fontSize: '32px', fill: '#fff'});
+
+        nombreText = this.add.text(100, 300, nombre3, { fontSize: '32px', fill: '#fff' });
+        scoreText = this.add.text(500, 300, score3, { fontSize: '32px', fill: '#fff'});
+        nombreText = this.add.text(100, 350, nombre4, { fontSize: '32px', fill: '#fff' });
+        scoreText = this.add.text(500, 350, score4, { fontSize: '32px', fill: '#fff'});
+
+        nombreText = this.add.text(100, 400, nombre5, { fontSize: '32px', fill: '#fff' });
+        scoreText = this.add.text(500, 400, score5, { fontSize: '32px', fill: '#fff'});
+            //no pudimos el score, :( pa que no se vea tan solito
+
+
 
         menu.on('pointerup', (() =>{
             location.assign('menu.html');
