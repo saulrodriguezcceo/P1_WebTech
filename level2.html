@@ -43,12 +43,12 @@
     var bombs;
     var platforms;
     var cursors;
-    var score = 0;
+    var score = 200;
     var gameOver = false;
     var scoreText;
     var flag=false;
     var pause_label;
-    var Name="";
+    var nombre= window.localStorage.getItem('Name');
     var fondo,estrella,boom;
     var w = 800, h = 600;
 
@@ -266,7 +266,7 @@
             gameOver=false;
 
             if (vida===0){
-                location.replace('menu.html');
+                location.replace('gameover.html');
             }
             return;
 
@@ -301,7 +301,7 @@
         if(score>1000){
             //car.disableBody(true,true);
             this.physics.pause();
-            localStorage.setItem(score,name);
+            localStorage.setItem('score', score);
             location.replace('menu.html');
         }else{
             this.physics.resume();
