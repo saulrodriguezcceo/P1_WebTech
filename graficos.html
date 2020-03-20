@@ -174,7 +174,17 @@ function update ()
         gameOver=false;
 
         return;
-
+        if (vida===0){
+            location.replace('gameover.html');
+        }
+       return;
+        
+        
+    }
+    if (score>=100 && score<200 && band===0){
+        //  A new batch of stars to collect
+        band=1;
+             stars.children.iterate(function (child) {
         //record();
     }
 
